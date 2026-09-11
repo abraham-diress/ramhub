@@ -3,7 +3,10 @@
 from datetime import date
 
 from app.database import Base, SessionLocal, engine
-from app.models import Contact, Course, PaperworkItem
+from app import domains  # noqa: F401  (registers models on Base.metadata)
+from app.domains.contacts.models import Contact
+from app.domains.courses.models import Course
+from app.domains.paperwork.models import PaperworkItem
 
 COURSES = [
     dict(
