@@ -6,7 +6,7 @@ databases:
 
 services:
   - type: web
-    name: ramhub-backend
+    name: ramhub-backend-api
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
