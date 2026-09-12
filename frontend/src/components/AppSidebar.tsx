@@ -7,6 +7,7 @@ import { LayoutDashboard, CalendarDays, BookOpen, FileText, Users, LogOut } from
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import Logo from "@/components/Logo";
 
 const APP_LINKS = [
   { href: "/app/boards", label: "Boards", icon: LayoutDashboard },
@@ -41,7 +42,7 @@ export default function AppSidebar({ userName, userEmail }: { userName: string; 
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r bg-card px-4 py-6">
       <Link href="/" className="mb-8 px-2 font-heading text-lg font-semibold tracking-tight">
-        🐏 RamHub
+        <Logo />
       </Link>
 
       <nav className="flex flex-col gap-1">

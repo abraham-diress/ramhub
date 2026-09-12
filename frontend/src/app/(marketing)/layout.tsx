@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MarketingNav from "@/components/MarketingNav";
+import Logo from "@/components/Logo";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,7 +9,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <main className="flex-1">{children}</main>
       <footer className="border-t px-6 py-8 text-sm text-muted-foreground">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
-          <p>🐏 RamHub — built for Fordham international students.</p>
+          <p className="flex items-center gap-2">
+            <Logo /> — built for Fordham international students.
+          </p>
           <div className="flex gap-6">
             <Link href="/courses" className="hover:text-foreground">
               Courses

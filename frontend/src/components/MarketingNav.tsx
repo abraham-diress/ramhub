@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { Button } from "@/components/ui/button";
+import Logo from "@/components/Logo";
 
 const LINKS = [
   { href: "/courses", label: "Courses" },
@@ -15,7 +16,7 @@ export default async function MarketingNav() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="font-heading text-lg font-semibold tracking-tight">
-          🐏 RamHub
+          <Logo />
         </Link>
         <ul className="hidden gap-8 text-sm text-muted-foreground sm:flex">
           {LINKS.map((link) => (
