@@ -1,78 +1,36 @@
-"use client";
-
-import { motion } from "motion/react";
-import { LayoutDashboard, CalendarDays, FileText, Search, Users, BookOpen } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, Link2 } from "lucide-react";
 
 const FEATURES = [
   {
+    icon: ShieldCheck,
+    title: "Sourced, not remembered",
+    description:
+      "Every item links to the Fordham or federal page it came from, with the date it was last checked. If it is out of date, you can see that.",
+  },
+  {
     icon: LayoutDashboard,
-    title: "Trello-style boards",
-    description: "Create boards for each semester, drag cards between To Do, In Progress, and Done.",
+    title: "Your own board",
+    description:
+      "Move anything from the checklist onto a personal board, drag it between columns, and see the due dates on one calendar.",
   },
   {
-    icon: CalendarDays,
-    title: "One calendar",
-    description: "Card due dates show up automatically alongside events you add yourself.",
-  },
-  {
-    icon: FileText,
-    title: "Paperwork, demystified",
-    description: "CPT/OPT, health insurance, immunization records — with real deadlines and who to ask.",
-  },
-  {
-    icon: BookOpen,
-    title: "Course intel",
-    description: "What to register for, when, and tips from students who've actually taken it.",
-  },
-  {
-    icon: Users,
-    title: "The right contact",
-    description: "Stop guessing which office handles what — it's mapped out for you.",
-  },
-  {
-    icon: Search,
-    title: "Search everything",
-    description: "One search bar across courses, paperwork, and contacts.",
+    icon: Link2,
+    title: "The right office, first try",
+    description:
+      "Each deadline names the office that actually handles it, with the email, phone, and room number for both campuses.",
   },
 ];
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay: (i % 3) * 0.08, ease: "easeOut" as const },
-  }),
-};
-
 export default function FeatureGrid() {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20">
-      <div className="mx-auto mb-12 max-w-xl text-center">
-        <h2 className="font-heading text-3xl font-semibold tracking-tight">One platform, not five group chats</h2>
-        <p className="mt-3 text-muted-foreground">
-          RamHub combines the onboarding knowledge Fordham never wrote down with the tools you
-          actually use to stay organized.
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {FEATURES.map((feature, i) => (
-          <motion.div
-            key={feature.title}
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-60px" }}
-            custom={i}
-            className="rounded-2xl border bg-card p-6 transition-colors hover:border-primary/40"
-          >
-            <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <feature.icon className="size-5" />
-            </div>
-            <h3 className="font-medium">{feature.title}</h3>
-            <p className="mt-1.5 text-sm text-muted-foreground">{feature.description}</p>
-          </motion.div>
+    <section className="border-t bg-muted/20 px-6 py-16">
+      <div className="mx-auto grid max-w-5xl gap-8 sm:grid-cols-3">
+        {FEATURES.map((feature) => (
+          <div key={feature.title}>
+            <feature.icon className="size-5 text-primary" />
+            <h3 className="mt-3 font-medium">{feature.title}</h3>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+          </div>
         ))}
       </div>
     </section>

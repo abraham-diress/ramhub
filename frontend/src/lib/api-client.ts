@@ -111,6 +111,18 @@ export const boardsApi = {
     }),
   removeCard: (token: string, cardId: number) =>
     request<void>(token, `/api/boards/cards/${cardId}`, { method: "DELETE" }),
+  trackPaperwork: (token: string, paperworkId: number) =>
+    request<TrackResult>(token, "/api/boards/track", {
+      method: "POST",
+      body: JSON.stringify({ paperwork_id: paperworkId }),
+    }),
+};
+
+export type TrackResult = {
+  board_id: number;
+  board_title: string;
+  card: Card;
+  already_tracked: boolean;
 };
 
 export const calendarApi = {

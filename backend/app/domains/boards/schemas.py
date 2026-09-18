@@ -61,3 +61,14 @@ class BoardDetailOut(BoardOut):
 
 class BoardCreate(BaseModel):
     title: str
+
+
+class TrackPaperworkIn(BaseModel):
+    paperwork_id: int
+
+
+class TrackPaperworkOut(BaseModel):
+    board_id: int
+    board_title: str
+    card: CardOut
+    already_tracked: bool

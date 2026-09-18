@@ -8,13 +8,20 @@ from app.domains.paperwork.schemas import PaperworkItemOut
 
 router = APIRouter(prefix="/api/paperwork", tags=["paperwork"])
 
+# Ordered the way a student actually hits them, which is how the UI groups them.
+PHASES = ["before_arrival", "first_10_days", "first_semester", "ongoing", "employment"]
+
 
 @router.get("", response_model=list[PaperworkItemOut])
-def list_paperwork(db: Session = Depends(get_db)):
-    stmt = select(PaperworkItem).options(joinedload(PaperworkItem.contact)).order_by(
-        PaperworkItem.deadline_date.is_(None), PaperworkItem.deadline_date
+def list_paperwork(phase: str | None = None, db: Session = Depends(get_db)):
+    stmt = select(PaperworkItem).options(joinedload(PaperworkItem.contact))
+    if phase:
+        stmt = stmt.where(PaperworkItem.phase == phase)
+    items = db.execute(stmt).scalars().all()
+    return sorted(
+        items,
+        key=lambda i: (PHASES.index(i.phase) if i.phase in PHASES else len(PHASES), i.position),
     )
-    return db.execute(stmt).scalars().all()
 
 
 @router.get("/{item_id}", response_model=PaperworkItemOut)

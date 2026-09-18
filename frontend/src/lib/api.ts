@@ -16,21 +16,49 @@ export type Contact = {
   name: string;
   role: string;
   office: string;
+  category: string;
   email: string | null;
   phone: string | null;
+  website: string | null;
+  rose_hill_location: string | null;
+  lincoln_center_location: string | null;
   reach_out_for: string;
 };
+
+export type Phase = "before_arrival" | "first_10_days" | "first_semester" | "ongoing" | "employment";
 
 export type PaperworkItem = {
   id: number;
   title: string;
   description: string;
   applies_to: string;
+  phase: Phase;
   deadline_date: string | null;
   deadline_note: string | null;
+  steps: string[];
+  is_critical: boolean;
   external_link: string | null;
+  source_name: string | null;
+  source_url: string | null;
+  last_verified: string | null;
   contact: Contact | null;
 };
+
+export const PHASE_LABELS: Record<Phase, string> = {
+  before_arrival: "Before you arrive",
+  first_10_days: "Your first 10 days",
+  first_semester: "First semester",
+  ongoing: "Keeping your status",
+  employment: "Working in the US",
+};
+
+export const PHASE_ORDER: Phase[] = [
+  "before_arrival",
+  "first_10_days",
+  "first_semester",
+  "ongoing",
+  "employment",
+];
 
 export type SearchResult = {
   type: "course" | "paperwork" | "contact";

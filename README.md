@@ -9,14 +9,21 @@ Fordham has no centralized source of practical onboarding knowledge for internat
 ## What it does (v1)
 
 **Public resources** (no account needed)
-- **Courses** — program-specific course info with registration tips from students who've taken them
-- **Paperwork** — CPT/OPT, health insurance waiver, immunization records, etc., each with deadlines and the right contact
-- **Contacts** — a directory mapping "I need to do X" to the actual office/person, instead of guessing
+- **Paperwork** — 19 items covering the full arc from signing your I-20 to filing for OPT, grouped into the phase you hit them in (before you arrive → first 10 days → first semester → keeping your status → working in the US). Each carries step-by-step instructions, the office that handles it, the source page it came from, and the date it was last checked.
+- **Contacts** — every office grouped by the kind of problem it solves, with emails, phone numbers, and room numbers for both Rose Hill and Lincoln Center
+- **Programs** — degree requirements from the Fordham bulletin, plus a submission form for student course notes
 - **Search** — one search bar across all of the above
 
 **Your account** (sign up free)
-- **Boards** — Trello-style boards with drag-and-drop cards across customizable lists, for tracking your own semester tasks
+- **Track this** — one click turns any paperwork item into a card on your board, with its deadline and instructions attached. This is the seam between the shared reference content and your own to-do list.
+- **Boards** — Trello-style boards with drag-and-drop cards across customizable lists
 - **Calendar** — a month view combining events you add yourself with due dates pulled automatically from your board cards
+
+### On data quality
+
+Immigration and billing rules change, and stale advice is worse than none. So every paperwork item stores `source_name`, `source_url`, and `last_verified`, all surfaced in the UI. Content was compiled from Fordham's International Student Pre-Arrival Guide, the OIS CPT documentation, and USCIS guidance; anything that could not be verified against a primary source was left out rather than guessed at. Course-level workload notes are deliberately empty until students submit them — that is not something a scraper can honestly produce.
+
+The seed script is declarative: it inserts, updates, *and* prunes reference content so corrections actually propagate on redeploy. Student submissions live in a separate table and are never touched by it.
 
 ## Architecture
 
@@ -59,6 +66,6 @@ Visit `http://localhost:3000`. The frontend expects the API at `http://localhost
 ## Roadmap
 
 - Google Calendar sync (real two-way sync once a Google Cloud OAuth app is set up — the in-app calendar is built to the point where this is an additive integration, not a rework)
-- Moderated review flow for student-submitted corrections
+- Admin review UI for the student submissions queue (the API and the submission form exist; approving currently means a database write)
 - Full-text/embedding search over official OISS documents (I-20 guides, handbooks) for direct Q&A instead of just browsing
 - Per-semester deadline tracking (auto-rolling dates rather than hardcoded ones)

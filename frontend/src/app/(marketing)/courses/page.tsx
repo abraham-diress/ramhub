@@ -1,44 +1,55 @@
-import { Course, getCourses } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
+import ContributeForm from "@/features/contribute/ContributeForm";
+import { getCourses } from "@/lib/api";
 
-function groupByProgram(courses: Course[]): Record<string, Course[]> {
-  return courses.reduce<Record<string, Course[]>>((acc, course) => {
-    (acc[course.program] ??= []).push(course);
-    return acc;
-  }, {});
-}
+export const metadata = {
+  title: "Programs and course notes | RamHub",
+  description: "Program requirements for Fordham graduate programs, plus course notes from students.",
+};
 
 export default async function CoursesPage() {
-  const courses = await getCourses();
-  const byProgram = groupByProgram(courses);
+  const programs = await getCourses();
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
-      <div className="flex flex-col gap-8">
-        <h1 className="font-heading text-2xl font-semibold tracking-tight">Courses</h1>
-        {Object.entries(byProgram).map(([program, list]) => (
-          <section key={program} className="flex flex-col gap-3">
-            <h2 className="text-sm font-medium uppercase tracking-wide text-muted-foreground">{program}</h2>
-            <div className="flex flex-col gap-3">
-              {list.map((course) => (
-                <article key={course.id} className="rounded-xl border bg-card p-4">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="font-medium">
-                      {course.code} — {course.title}
-                    </h3>
-                    <Badge variant="secondary" className="shrink-0">
-                      {course.credits} credits
-                      {course.recommended_term ? ` · ${course.recommended_term}` : ""}
-                    </Badge>
-                  </div>
-                  {course.description && <p className="mt-2 text-sm text-muted-foreground">{course.description}</p>}
-                  {course.tips && <p className="mt-2 text-sm text-muted-foreground">💡 {course.tips}</p>}
-                </article>
-              ))}
+    <div className="mx-auto max-w-3xl px-6 py-12">
+      <header>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight">Programs and course notes</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Degree requirements come from the Fordham bulletin. Everything about what a course is
+          actually like has to come from students who took it.
+        </p>
+      </header>
+
+      <div className="mt-8 space-y-3">
+        {programs.map((program) => (
+          <article key={program.id} className="rounded-xl border bg-card p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="font-medium">{program.title}</h2>
+              <Badge variant="secondary" className="shrink-0">
+                {program.credits} credits
+              </Badge>
             </div>
-          </section>
+            {program.description && (
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{program.description}</p>
+            )}
+            {program.tips && (
+              <p className="mt-3 border-t pt-3 text-sm leading-relaxed text-muted-foreground">
+                {program.tips}
+              </p>
+            )}
+          </article>
         ))}
       </div>
+
+      <section className="mt-12">
+        <h2 className="font-heading text-lg font-semibold tracking-tight">Add a course note</h2>
+        <p className="mt-2 mb-4 text-sm text-muted-foreground">
+          There is no honest way to publish workload and difficulty notes without students writing
+          them. If you have taken a course here, this is the part only you can fill in. Submissions
+          are reviewed before they go live.
+        </p>
+        <ContributeForm defaultCategory="course" />
+      </section>
     </div>
   );
 }

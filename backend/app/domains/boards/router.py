@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -16,11 +18,15 @@ from app.domains.boards.schemas import (
     ColumnCreate,
     ColumnOut,
     ColumnUpdate,
+    TrackPaperworkIn,
+    TrackPaperworkOut,
 )
+from app.domains.paperwork.models import PaperworkItem
 
 router = APIRouter(prefix="/api/boards", tags=["boards"])
 
 DEFAULT_COLUMNS = ["To Do", "In Progress", "Done"]
+STARTER_BOARD_TITLE = "My Checklist"
 
 
 def _get_owned_board(db: Session, board_id: int, user: User, *, with_columns: bool = False) -> Board:
@@ -149,3 +155,52 @@ def delete_card(card_id: int, db: Session = Depends(get_db), user: User = Depend
     card = _get_owned_card(db, card_id, user)
     db.delete(card)
     db.commit()
+
+
+@router.post("/track", response_model=TrackPaperworkOut, status_code=201)
+def track_paperwork(
+    payload: TrackPaperworkIn, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+):
+    """Turn a paperwork item into a card on the student's board, creating a board if needed."""
+    item = db.get(PaperworkItem, payload.paperwork_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Paperwork item not found")
+
+    stmt = (
+        select(Board)
+        .where(Board.owner_id == user.id)
+        .options(selectinload(Board.columns).selectinload(BoardColumn.cards))
+        .order_by(Board.created_at)
+    )
+    board = db.execute(stmt).scalars().first()
+    if board is None:
+        board = Board(title=STARTER_BOARD_TITLE, owner_id=user.id)
+        board.columns = [BoardColumn(title=title, position=i) for i, title in enumerate(DEFAULT_COLUMNS)]
+        db.add(board)
+        db.commit()
+        board = _get_owned_board(db, board.id, user, with_columns=True)
+
+    target = board.columns[0]
+    existing = next((c for c in target.cards if c.title == item.title), None)
+    if existing is not None:
+        return TrackPaperworkOut(
+            board_id=board.id, board_title=board.title, card=existing, already_tracked=True
+        )
+
+    details = [item.description]
+    if item.deadline_note:
+        details.append(f"Deadline: {item.deadline_note}")
+    if item.external_link:
+        details.append(item.external_link)
+
+    card = Card(
+        column_id=target.id,
+        title=item.title,
+        description="\n\n".join(details),
+        due_date=datetime.combine(item.deadline_date, time.min) if item.deadline_date else None,
+        position=len(target.cards),
+    )
+    db.add(card)
+    db.commit()
+    db.refresh(card)
+    return TrackPaperworkOut(board_id=board.id, board_title=board.title, card=card, already_tracked=False)
