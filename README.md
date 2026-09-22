@@ -2,7 +2,7 @@
 
 **A platform for Fordham's international students** — the courses to register for, the paperwork to file (and when), and who to actually contact, plus your own Trello-style boards and calendar to stay on top of it — instead of scattered advisor emails, PDFs, and group chats.
 
-## Problem
+## Problem 
 
 Fordham has no centralized source of practical onboarding knowledge for international students. Course registration tips, CPT/OPT and visa-related paperwork deadlines, and "which office handles this" all live in people's heads and get re-asked, one-on-one, every semester — most urgently during registration and OPT/CPT filing windows, when getting it wrong has real consequences (registration holds, visa status issues, delayed graduation). RamHub exists so that knowledge is written down once and stays discoverable for the next cohort, instead of evaporating when each class graduates — and gives students a place to actually track their own tasks and deadlines against it.
 
@@ -63,7 +63,7 @@ npm run dev
 
 Visit `http://localhost:3000`. The frontend expects the API at `http://localhost:8000` and needs an `AUTH_SECRET` for Auth.js — see `frontend/.env.local` (generate one with `openssl rand -base64 32`).
 
-## Roadmap
+### Roadmap
 
 - Google Calendar sync (real two-way sync once a Google Cloud OAuth app is set up — the in-app calendar is built to the point where this is an additive integration, not a rework)
 - Admin review UI for the student submissions queue (the API and the submission form exist; approving currently means a database write)
