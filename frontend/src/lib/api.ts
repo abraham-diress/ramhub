@@ -72,8 +72,17 @@ export type SearchResult = {
 // on it, and `fetchOrNull` keeps a sleeping backend from turning into a 500 for the reader.
 const REVALIDATE_SECONDS = 300;
 
+// Without this, a backend that accepts the connection and then stalls (a crash-looping
+// container, a cold instance) never rejects, so `fetchOrNull` has nothing to catch and the
+// page hangs until the build or request times out. A refused connection fails instantly;
+// a hung one does not. This bounds both cases.
+const TIMEOUT_MS = 10_000;
+
 async function apiFetch<T>(path: string, revalidate: number = REVALIDATE_SECONDS): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { next: { revalidate } });
+  const res = await fetch(`${API_URL}${path}`, {
+    next: { revalidate },
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+  });
   if (!res.ok) {
     throw new Error(`Request to ${path} failed with ${res.status}`);
   }
