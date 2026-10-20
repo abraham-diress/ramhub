@@ -1,5 +1,6 @@
 import { Globe, Mail, MapPin, Phone } from "lucide-react";
-import { getContacts, type Contact } from "@/lib/api";
+import ResourceUnavailable from "@/components/ResourceUnavailable";
+import { fetchOrNull, getContacts, type Contact } from "@/lib/api";
 
 export const metadata = {
   title: "Who to contact | RamHub",
@@ -94,11 +95,11 @@ function ContactCard({ contact }: { contact: Contact }) {
 }
 
 export default async function ContactsPage() {
-  const contacts = await getContacts();
+  const contacts = await fetchOrNull(getContacts());
   const groups = CATEGORY_ORDER.map((category) => ({
     category,
     label: CATEGORY_LABELS[category] ?? category,
-    items: contacts.filter((c) => c.category === category),
+    items: (contacts ?? []).filter((c) => c.category === category),
   })).filter((group) => group.items.length > 0);
 
   return (
@@ -110,6 +111,12 @@ export default async function ContactsPage() {
           the people who can actually fix it.
         </p>
       </header>
+
+      {contacts === null && (
+        <div className="mt-10">
+          <ResourceUnavailable resource="the contact directory" />
+        </div>
+      )}
 
       <div className="mt-10 space-y-10">
         {groups.map((group) => (

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SearchBar from "@/components/SearchBar";
-import { search, SearchResult } from "@/lib/api";
+import ResourceUnavailable from "@/components/ResourceUnavailable";
+import { fetchOrNull, search, SearchResult } from "@/lib/api";
 
 const TYPE_LABEL: Record<SearchResult["type"], string> = {
   course: "Course",
@@ -20,7 +21,7 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const results = q ? await search(q) : [];
+  const results = q ? await fetchOrNull(search(q)) : [];
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12">
@@ -30,14 +31,16 @@ export default async function SearchPage({
           <SearchBar initialQuery={q} />
         </div>
 
-        {q && (
+        {q && results !== null && (
           <p className="text-sm text-muted-foreground">
             {results.length} result{results.length === 1 ? "" : "s"} for &ldquo;{q}&rdquo;
           </p>
         )}
 
+        {results === null && <ResourceUnavailable resource="search results" />}
+
         <div className="flex flex-col gap-3">
-          {results.map((r) => (
+          {(results ?? []).map((r) => (
             <Link
               key={`${r.type}-${r.id}`}
               href={TYPE_HREF[r.type]}

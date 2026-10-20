@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import ContributeForm from "@/features/contribute/ContributeForm";
-import { getCourses } from "@/lib/api";
+import ResourceUnavailable from "@/components/ResourceUnavailable";
+import { fetchOrNull, getCourses } from "@/lib/api";
 
 export const metadata = {
   title: "Programs and course notes | RamHub",
@@ -8,7 +9,7 @@ export const metadata = {
 };
 
 export default async function CoursesPage() {
-  const programs = await getCourses();
+  const programs = await fetchOrNull(getCourses());
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
@@ -20,8 +21,14 @@ export default async function CoursesPage() {
         </p>
       </header>
 
+      {programs === null && (
+        <div className="mt-8">
+          <ResourceUnavailable resource="program requirements" />
+        </div>
+      )}
+
       <div className="mt-8 space-y-3">
-        {programs.map((program) => (
+        {(programs ?? []).map((program) => (
           <article key={program.id} className="rounded-xl border bg-card p-5">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="font-medium">{program.title}</h2>

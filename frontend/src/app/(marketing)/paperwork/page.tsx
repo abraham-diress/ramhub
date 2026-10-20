@@ -1,6 +1,7 @@
 import { Info } from "lucide-react";
 import PaperworkCard from "@/features/paperwork/PaperworkCard";
-import { getPaperwork, PHASE_LABELS, PHASE_ORDER } from "@/lib/api";
+import ResourceUnavailable from "@/components/ResourceUnavailable";
+import { fetchOrNull, getPaperwork, PHASE_LABELS, PHASE_ORDER } from "@/lib/api";
 
 export const metadata = {
   title: "Paperwork and deadlines | RamHub",
@@ -9,12 +10,14 @@ export const metadata = {
 };
 
 export default async function PaperworkPage() {
-  const items = await getPaperwork();
-  const groups = PHASE_ORDER.map((phase) => ({
-    phase,
-    label: PHASE_LABELS[phase],
-    items: items.filter((item) => item.phase === phase),
-  })).filter((group) => group.items.length > 0);
+  const items = await fetchOrNull(getPaperwork());
+  const groups = (items ?? []).length
+    ? PHASE_ORDER.map((phase) => ({
+        phase,
+        label: PHASE_LABELS[phase],
+        items: (items ?? []).filter((item) => item.phase === phase),
+      })).filter((group) => group.items.length > 0)
+    : [];
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
@@ -34,6 +37,12 @@ export default async function PaperworkPage() {
           Office for International Services before you act on it.
         </p>
       </div>
+
+      {items === null && (
+        <div className="mt-10">
+          <ResourceUnavailable resource="the checklist" />
+        </div>
+      )}
 
       <div className="mt-10 space-y-12">
         {groups.map((group) => (

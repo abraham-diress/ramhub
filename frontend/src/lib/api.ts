@@ -67,12 +67,25 @@ export type SearchResult = {
   snippet: string;
 };
 
-async function apiFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
+// Reference content changes rarely, and the API sleeps on a free Render instance where a
+// cold start can outlast the serverless function. Caching means most page views never wait
+// on it, and `fetchOrNull` keeps a sleeping backend from turning into a 500 for the reader.
+const REVALIDATE_SECONDS = 300;
+
+async function apiFetch<T>(path: string, revalidate: number = REVALIDATE_SECONDS): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, { next: { revalidate } });
   if (!res.ok) {
     throw new Error(`Request to ${path} failed with ${res.status}`);
   }
   return res.json() as Promise<T>;
+}
+
+export async function fetchOrNull<T>(promise: Promise<T>): Promise<T | null> {
+  try {
+    return await promise;
+  } catch {
+    return null;
+  }
 }
 
 export const getCourses = (program?: string) =>
@@ -82,7 +95,8 @@ export const getPaperwork = () => apiFetch<PaperworkItem[]>("/api/paperwork");
 
 export const getContacts = () => apiFetch<Contact[]>("/api/contacts");
 
-export const search = (q: string) => apiFetch<SearchResult[]>(`/api/search?q=${encodeURIComponent(q)}`);
+export const search = (q: string) =>
+  apiFetch<SearchResult[]>(`/api/search?q=${encodeURIComponent(q)}`, 60);
 
 export const submitCorrection = async (payload: { category: string; content: string; submitter_email?: string }) => {
   const res = await fetch(`${API_URL}/api/submissions`, {
