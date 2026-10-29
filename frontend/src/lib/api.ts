@@ -76,7 +76,10 @@ const REVALIDATE_SECONDS = 300;
 // container, a cold instance) never rejects, so `fetchOrNull` has nothing to catch and the
 // page hangs until the build or request times out. A refused connection fails instantly;
 // a hung one does not. This bounds both cases.
-const TIMEOUT_MS = 10_000;
+// A healthy warm response is a few hundred milliseconds, and a cold Render instance takes
+// ~50s, which no sane timeout would wait for anyway. So this only needs to cover the warm
+// case; anything longer is a wait the reader should not be made to sit through.
+const TIMEOUT_MS = 5_000;
 
 async function apiFetch<T>(path: string, revalidate: number = REVALIDATE_SECONDS): Promise<T> {
   const res = await fetch(`${API_URL}${path}`, {
